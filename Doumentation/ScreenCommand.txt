@@ -1,0 +1,45 @@
+Start Connection to BeagleBone
+
+ssh 192.168.7.2 -l debian
+OR
+screen /dev/tty.usbserial-TIYZGOPYB 115200
+
+Connect Audio Cape:
+sudo su
+echo BB-BONE-DVID-02 > /sys/devices/bone_capemgr*/slots
+
+Record to a 20 second file from UMIK
+ arecord -f S24_3LE -r 48000 -c 2 -d 20 -t RAW -D hw:1 response.raw
+
+Record the test volume for 1 second
+arecord -f S24_3LE -r 48000 -c 2 -d 1  -D hw:1 test.wav
+sox test.wav -n stats
+
+            Overall     Left      Right
+DC offset   0.000381  0.000381  0.000381
+Min level  -0.211808 -0.211808 -0.211808
+Max level   0.205814  0.205814  0.205814
+Pk lev dB     -13.48    -13.48    -13.48
+RMS lev dB    -25.53    -25.53    -25.53
+RMS Pk dB     -24.46    -24.46    -24.46
+RMS Tr dB     -26.29    -26.29    -26.29
+Crest factor       -      4.00      4.00
+Flat factor     0.00      0.00      0.00
+Pk count           2         2         2
+Bit-depth      19/21     19/21     19/21
+Num samples    48.0k
+Length s       1.000
+Scale max   1.000000
+Window s       0.050
+
+
+Compile a file using fftw3:
+g++ *.cpp -L/usr/lib/arm-linux-gnueabihf/ -lfftw3 -lm
+
+Compile a file using portaudio:
+g++ -lrt -lasound -ljack -lpthread -lportaudio *.cpp
+
+
+
+Debian Version on board:
+bone-debian-7.8-lxde-4gb-armhf-2015-03-01-4gb.img
